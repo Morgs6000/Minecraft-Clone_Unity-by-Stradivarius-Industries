@@ -14,7 +14,13 @@ public class Chunk {
 
     private Material material;
 
-    private Vector3 chunkSizeInBlocks = new Vector3(16, 16, 16);
+    private static Vector3 chunkSizeInBlocks = new Vector3(16, 16, 16);
+
+    private Block[,,] blocks = new Block[
+        (int)chunkSizeInBlocks.x,
+        (int)chunkSizeInBlocks.y,
+        (int)chunkSizeInBlocks.z
+    ];
 
     public Chunk(Transform world) {
         GameObject newChunk = new GameObject();
@@ -34,9 +40,21 @@ public class Chunk {
         this.ChunkGen();
     }
 
+    public void BlockMapGen() {
+        for(int x = 0; x < chunkSizeInBlocks.x; x++) {
+            for(int y = 0; y < chunkSizeInBlocks.y; y++) {
+                for(int z = 0; z < chunkSizeInBlocks.z; z++) {                    
+                    this.blocks[x, y, z] = Block.GRASS;
+                }
+            }
+        }
+
+        this.ChunkGen();
+    }
+
     private void ChunkGen() {
-        for(int x = 0; x < this.chunkSizeInBlocks.x; x++) {
-            for(int y = 0; y < this.chunkSizeInBlocks.y; y++) {
+        for(int x = 0; x < chunkSizeInBlocks.x; x++) {
+            for(int y = 0; y < chunkSizeInBlocks.y; y++) {
                 for(int z = 0; z < chunkSizeInBlocks.z; z++) {
                     this.BlockGen(new Vector3(x, y, z));
                 }
@@ -49,12 +67,12 @@ public class Chunk {
     private void BlockGen(Vector3 offset) {
         for(int side = 0; side < 6; side++) {
             for(int verts = 0; verts < 4; verts++) {
-                this.vertices.Add(Block.vertices[side, verts] + offset);
+                this.vertices.Add(Block.GetVertices()[side, verts] + offset);
 
-                this.uv.Add(Block.uv(new Vector2(0, 0))[verts]);
+                this.uv.Add(Block.SetUV(new Vector2(0, 0))[verts]);
             }
             for(int tris = 0; tris < 6; tris++) {
-                this.triangles.Add(Block.triangles[tris] + vertexIndex);
+                this.triangles.Add(Block.GetTriangles()[tris] + vertexIndex);
             }
 
             this.vertexIndex += 4;
