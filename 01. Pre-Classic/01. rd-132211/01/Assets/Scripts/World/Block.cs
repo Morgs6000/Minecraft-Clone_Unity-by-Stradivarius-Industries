@@ -6,13 +6,24 @@ public class Block {
     public static List<Block> blocks = new List<Block>();
 
     public static Block AIR = new Block();
-    public static Block STONE = new Block();
-    public static Block GRASS = new Block();
+    public static Block STONE = new Block().SetUVCoord(1, 0);
+    public static Block GRASS = new Block().SetUVCoord(0, 0);
+
+    private Vector2 blockUV;
 
     private bool isTransparent;
 
     private Block() {
         blocks.Add(this);
+    }
+
+    public Block SetUVCoord(int x, int y) {
+        this.blockUV = new Vector2(x, y);
+        return this;
+    }
+
+    public Vector2 GetUVCoord() {
+        return this.blockUV;
     }
 
     public bool IsBlockTransparent() {
@@ -73,14 +84,14 @@ public class Block {
     }
 
     // Define as coordenadas de textura (UV) para mapear a textura no bloco
-    public static Vector2[] SetUV(Vector2 textureCoordinate) {
+    public static Vector2[] SetUV(Vector2 textureUVCoord) {
         // Define o tamanho da textura em "tiles"
         Vector2 textureSizeInTiles = new Vector2(16, 16);
 
-        float x = textureCoordinate.x;
+        float x = textureUVCoord.x;
         
         // Inverte as coordenadas y para se adequar à convenção de texturas
-        float y = (textureSizeInTiles.y - 1) - textureCoordinate.y;
+        float y = (textureSizeInTiles.y - 1) - textureUVCoord.y;
 
         // Calcula o tamanho de um "tile" em termos de coordenadas UV
         float tileSizeX = 1.0f / textureSizeInTiles.x;

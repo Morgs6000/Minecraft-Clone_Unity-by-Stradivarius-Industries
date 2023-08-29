@@ -56,7 +56,9 @@ public class Chunk {
         for(int x = 0; x < chunkSizeInBlocks.x; x++) {
             for(int y = 0; y < chunkSizeInBlocks.y; y++) {
                 for(int z = 0; z < chunkSizeInBlocks.z; z++) {
-                    this.BlockGen(new Vector3(x, y, z));
+                    //if(blocks[x, y, z] != null) {
+                        this.BlockGen(new Vector3(x, y, z));
+                    //}
                 }
             }
         }
@@ -65,11 +67,15 @@ public class Chunk {
     }
 
     private void BlockGen(Vector3 offset) {
+        int x = (int)offset.x;
+        int y = (int)offset.y;
+        int z = (int)offset.z;
+
         for(int side = 0; side < 6; side++) {
             for(int verts = 0; verts < 4; verts++) {
                 this.vertices.Add(Block.GetVertices()[side, verts] + offset);
 
-                this.uv.Add(Block.SetUV(new Vector2(0, 0))[verts]);
+                this.uv.Add(Block.SetUV(Block.GRASS.GetUVCoord())[verts]);
             }
             for(int tris = 0; tris < 6; tris++) {
                 this.triangles.Add(Block.GetTriangles()[tris] + vertexIndex);
