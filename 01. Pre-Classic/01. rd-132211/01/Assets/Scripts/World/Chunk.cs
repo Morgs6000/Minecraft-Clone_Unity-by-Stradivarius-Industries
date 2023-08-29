@@ -72,17 +72,38 @@ public class Chunk {
         int z = (int)offset.z;
 
         for(int side = 0; side < 6; side++) {
-            for(int verts = 0; verts < 4; verts++) {
-                this.vertices.Add(Block.GetVertices()[side, verts] + offset);
+            if(!HasSolidNeighbor(Block.blockSide[side] + offset)) {
+                for(int verts = 0; verts < 4; verts++) {
+                    this.vertices.Add(Block.GetVertices()[side, verts] + offset);
 
-                this.uv.Add(Block.SetUV(Block.GRASS.GetUVCoord())[verts]);
-            }
-            for(int tris = 0; tris < 6; tris++) {
-                this.triangles.Add(Block.GetTriangles()[tris] + vertexIndex);
-            }
+                    this.uv.Add(Block.SetUV(Block.GRASS.GetUVCoord())[verts]);
+                }
+                for(int tris = 0; tris < 6; tris++) {
+                    this.triangles.Add(Block.GetTriangles()[tris] + vertexIndex);
+                }
 
-            this.vertexIndex += 4;
+                this.vertexIndex += 4;
+            }
         }
+    }
+
+    private bool HasSolidNeighbor(Vector3 offset) {
+        int x = (int)offset.x;
+        int y = (int)offset.y;
+        int z = (int)offset.z;
+
+        if(
+            x < 0 || x > chunkSizeInBlocks.x - 1 ||
+            y < 0 || y > chunkSizeInBlocks.y - 1 ||
+            z < 0 || z > chunkSizeInBlocks.z - 1
+        ) {
+            return false;
+        }
+        if(blocks[x, y, z] == null) {
+            return false;
+        }
+
+        return true;
     }
 
     private void MeshGen() {
