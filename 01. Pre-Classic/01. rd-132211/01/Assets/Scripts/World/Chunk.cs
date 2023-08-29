@@ -76,7 +76,7 @@ public class Chunk {
                 for(int verts = 0; verts < 4; verts++) {
                     this.vertices.Add(Block.GetVertices()[side, verts] + offset);
 
-                    this.uv.Add(Block.SetUV(Block.GRASS.GetUVCoord())[verts]);
+                    this.uv.Add(Block.SetUV(blocks[x, y, z].GetUVCoord())[verts]);
                 }
                 for(int tris = 0; tris < 6; tris++) {
                     this.triangles.Add(Block.GetTriangles()[tris] + vertexIndex);
