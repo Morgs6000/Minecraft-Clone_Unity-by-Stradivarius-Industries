@@ -76,19 +76,21 @@ public class Block {
     public static Vector2[] SetUV(Vector2 textureCoordinate) {
         // Define o tamanho da textura em "tiles"
         Vector2 textureSizeInTiles = new Vector2(16, 16);
+
+        float x = textureCoordinate.x;
         
         // Inverte as coordenadas y para se adequar à convenção de texturas
         float y = (textureSizeInTiles.y - 1) - textureCoordinate.y;
 
         // Calcula o tamanho de um "tile" em termos de coordenadas UV
-        float tileSizeU = 1.0f / textureSizeInTiles.x;
-        float tileSizeV = 1.0f / textureSizeInTiles.y;
+        float tileSizeX = 1.0f / textureSizeInTiles.x;
+        float tileSizeY = 1.0f / textureSizeInTiles.y;
 
         // Calcula as coordenadas UV para os cantos do retângulo
-        float x0 = textureCoordinate.x * tileSizeU;
-        float x1 = x0 + tileSizeU;
-        float y0 = y * tileSizeV;
-        float y1 = y0 + tileSizeV;
+        float x0 = x * tileSizeX;
+        float x1 = x0 + tileSizeX;
+        float y0 = y * tileSizeY;
+        float y1 = y0 + tileSizeY;
 
         // Retorna as coordenadas UV para mapeamento de textura
         return new Vector2[] {
