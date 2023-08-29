@@ -37,7 +37,7 @@ public class Chunk {
 
         this.material = Resources.Load<Material>("Materials/Terrain");
 
-        this.ChunkGen();
+        this.BlockMapGen();
     }
 
     public void BlockMapGen() {
@@ -56,9 +56,9 @@ public class Chunk {
         for(int x = 0; x < chunkSizeInBlocks.x; x++) {
             for(int y = 0; y < chunkSizeInBlocks.y; y++) {
                 for(int z = 0; z < chunkSizeInBlocks.z; z++) {
-                    //if(blocks[x, y, z] != null) {
+                    if(blocks[x, y, z] != null) {
                         this.BlockGen(new Vector3(x, y, z));
-                    //}
+                    }
                 }
             }
         }
