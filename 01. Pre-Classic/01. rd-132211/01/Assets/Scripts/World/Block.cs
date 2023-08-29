@@ -19,6 +19,7 @@ public class Block {
         return this.isTransparent;
     }
 
+    // Retorna os vértices das faces do bloco em um array 2D de Vector3
     public static Vector3[,] GetVertices() {
         return new Vector3[,] {
             /* RIGHT */ {            
@@ -60,6 +61,7 @@ public class Block {
         };
     }
 
+    // Retorna os índices dos vértices que formam os triângulos das faces do bloco
     public static int[] GetTriangles() {
         return new int[] {
             // Primeiro Triangulo
@@ -70,25 +72,30 @@ public class Block {
         };
     }
 
+    // Define as coordenadas de textura (UV) para mapear a textura no bloco
     public static Vector2[] SetUV(Vector2 textureCoordinate) {
+        // Define o tamanho da textura em "tiles"
         Vector2 textureSizeInTiles = new Vector2(16, 16);
         
-        float x = textureCoordinate.x;
-        float y = textureCoordinate.y;
+        // Inverte as coordenadas y para se adequar à convenção de texturas
+        float y = (textureSizeInTiles.y - 1) - textureCoordinate.y;
 
-        float _x = 1.0f / textureSizeInTiles.x;
-        float _y = 1.0f / textureSizeInTiles.y;
+        // Calcula o tamanho de um "tile" em termos de coordenadas UV
+        float tileSizeU = 1.0f / textureSizeInTiles.x;
+        float tileSizeV = 1.0f / textureSizeInTiles.y;
 
-        y = (textureSizeInTiles.y - 1) - y;
+        // Calcula as coordenadas UV para os cantos do retângulo
+        float x0 = textureCoordinate.x * tileSizeU;
+        float x1 = x0 + tileSizeU;
+        float y0 = y * tileSizeV;
+        float y1 = y0 + tileSizeV;
 
-        x *= _x;
-        y *= _y;
-
+        // Retorna as coordenadas UV para mapeamento de textura
         return new Vector2[] {
-            new Vector2(x, y),
-            new Vector2(x, y + _y),
-            new Vector2(x + _x, y + _y),
-            new Vector2(x + _x, y)
+            new Vector2(x0, y0),
+            new Vector2(x0, y1),
+            new Vector2(x1, y1),
+            new Vector2(x1, y0)
         };
     }
 }
