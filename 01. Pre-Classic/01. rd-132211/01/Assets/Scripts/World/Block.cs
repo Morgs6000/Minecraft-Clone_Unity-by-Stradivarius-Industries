@@ -5,13 +5,13 @@ using UnityEngine;
 public class Block {
     public static List<Block> blocks = new List<Block>();
 
-    public static Block AIR = new Block();
+    public static Block AIR = new Block().SetTransparent();
     public static Block STONE = new Block().SetUVCoord(1, 0);
     public static Block GRASS = new Block().SetUVCoord(0, 0);
 
     private Vector2 blockUV;
 
-    private bool isTransparent;
+    private bool isTransparent = false;
 
     private Block() {
         blocks.Add(this);
@@ -26,7 +26,12 @@ public class Block {
         return this.blockUV;
     }
 
-    public bool IsBlockTransparent() {
+    public Block SetTransparent() {
+        this.isTransparent = true;
+        return this;
+    }
+
+    public bool GetTransparent() {
         return this.isTransparent;
     }
 

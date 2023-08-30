@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Chunk {
+public class Chunk : MonoBehaviour {
     private List<Vector3> vertices = new List<Vector3>();
     private List<int> triangles = new List<int>();
     private List<Vector2> uv = new List<Vector2>();
@@ -14,7 +14,7 @@ public class Chunk {
 
     private Material material;
 
-    private static Vector3 chunkSizeInBlocks = new Vector3(16, 16, 16);
+    public static Vector3 chunkSizeInBlocks = new Vector3(16, 16, 16);
 
     private Block[,,] blocks = new Block[
         (int)chunkSizeInBlocks.x,
@@ -22,18 +22,28 @@ public class Chunk {
         (int)chunkSizeInBlocks.z
     ];
 
-    public Chunk(Transform world) {
-        GameObject newChunk = new GameObject();
+    public Chunk[] neighbors = new Chunk[6];
 
-        int x = Mathf.FloorToInt(newChunk.transform.position.x);
-        int y = Mathf.FloorToInt(newChunk.transform.position.y);
-        int z = Mathf.FloorToInt(newChunk.transform.position.z);
+    public void Init(Transform world, Vector3 offset) {
+        int x = (int)offset.x;
+        int y = (int)offset.y;
+        int z = (int)offset.z;
+        
+        Vector3 chunkOffset = new Vector3(
+            x * chunkSizeInBlocks.x,
+            y * chunkSizeInBlocks.y,
+            z * chunkSizeInBlocks.z
+        );
 
-        newChunk.name = "Chunk: " + x + ", " + y + ", " + z;
-        newChunk.transform.parent = world;
+        //GameObject newChunk = new GameObject();
 
-        this.meshFilter = newChunk.AddComponent<MeshFilter>();
-        this.meshRenderer = newChunk.AddComponent<MeshRenderer>();
+        name = "Chunk: " + x + ", " + y + ", " + z;
+        transform.parent = world;
+        transform.position = chunkOffset;
+
+        //Chunk chunk = gameObject.AddComponent<Chunk>();
+        this.meshFilter = gameObject.AddComponent<MeshFilter>();
+        this.meshRenderer = gameObject.AddComponent<MeshRenderer>();
 
         this.material = Resources.Load<Material>("Materials/Terrain");
 
@@ -44,12 +54,36 @@ public class Chunk {
         for(int x = 0; x < chunkSizeInBlocks.x; x++) {
             for(int y = 0; y < chunkSizeInBlocks.y; y++) {
                 for(int z = 0; z < chunkSizeInBlocks.z; z++) {                    
-                    this.blocks[x, y, z] = Block.GRASS;
+                    LayerGen(new Vector3(x, y, z));
                 }
             }
         }
 
         this.ChunkGen();
+    }
+
+    private void LayerGen(Vector3 offset) {
+        int x = (int)offset.x;
+        int y = (int)offset.y;
+        int z = (int)offset.z;
+
+        float _x = x + transform.position.x;
+        float _y = y + transform.position.y;
+        float _z = z + transform.position.z;
+
+        _x += World.worldSizeInBlocks.x;
+        //_y += World.worldSizeInBlocks.y;
+        _z += World.worldSizeInBlocks.z;
+
+        if(_y < 32) {
+            this.blocks[x, y, z] = Block.STONE;
+        }
+        else if(_y == 32) {
+            this.blocks[x, y, z] = Block.GRASS;
+        }
+        else {
+            this.blocks[x, y, z] = Block.AIR;
+        }
     }
 
     private void ChunkGen() {
@@ -73,6 +107,9 @@ public class Chunk {
 
         for(int side = 0; side < 6; side++) {
             if(!HasSolidNeighbor(Block.blockSide[side] + offset)) {
+                if(blocks[x, y, z] == Block.AIR) {
+                    continue;
+                }
                 for(int verts = 0; verts < 4; verts++) {
                     this.vertices.Add(Block.GetVertices()[side, verts] + offset);
 
@@ -92,18 +129,56 @@ public class Chunk {
         int y = (int)offset.y;
         int z = (int)offset.z;
 
-        if(
-            x < 0 || x > chunkSizeInBlocks.x - 1 ||
-            y < 0 || y > chunkSizeInBlocks.y - 1 ||
-            z < 0 || z > chunkSizeInBlocks.z - 1
-        ) {
-            return false;
+        if(x > chunkSizeInBlocks.x - 1) {
+            if(neighbors[0]) {
+                return neighbors[0].HasSolidNeighbor(new Vector3(x + chunkSizeInBlocks.x, y, z));
+            }
+            else {
+                return false;
+            }
         }
-        if(blocks[x, y, z] == null) {
-            return false;
+        if(x < 0) {
+            if(neighbors[1]) {
+                return neighbors[1].HasSolidNeighbor(new Vector3(x - chunkSizeInBlocks.x, y, z));
+            }
+            else {
+                return false;
+            }
+        }
+        if(y > chunkSizeInBlocks.y - 1) {
+            if(neighbors[2]) {
+                return neighbors[2].HasSolidNeighbor(new Vector3(x, y + chunkSizeInBlocks.y, z));
+            }
+            else {
+                return false;
+            }
+        }
+        if(y < 0) {
+            if(neighbors[3]) {
+                return neighbors[3].HasSolidNeighbor(new Vector3(x, y - chunkSizeInBlocks.y, z));
+            }
+            else {
+                return false;
+            }
+        }
+        if(z > chunkSizeInBlocks.z - 1) {
+            if(neighbors[4]) {
+                return neighbors[4].HasSolidNeighbor(new Vector3(x, y, z + chunkSizeInBlocks.z));
+            }
+            else {
+                return false;
+            }
+        }
+        if(z < 0) {
+            if(neighbors[5]) {
+                return neighbors[5].HasSolidNeighbor(new Vector3(x, y, z - chunkSizeInBlocks.z));
+            }
+            else {
+                return false;
+            }
         }
 
-        return true;
+        return !blocks[x, y, z].GetTransparent();
     }
 
     private void MeshGen() {
