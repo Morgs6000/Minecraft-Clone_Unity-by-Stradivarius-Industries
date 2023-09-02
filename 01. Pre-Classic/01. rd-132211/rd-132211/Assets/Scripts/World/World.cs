@@ -13,7 +13,7 @@ public class World : MonoBehaviour {
         worldSizeInBlocks.z / Chunk.chunkSizeInBlocks.z
     );
 
-    private List<Chunk> chunks = new List<Chunk>();
+    private static List<Chunk> chunks = new List<Chunk>();
 
     private void Start() {
         StartCoroutine(WorldGen());
@@ -36,18 +36,39 @@ public class World : MonoBehaviour {
 
                     this.GetNeighbor(chunk);
                     
-                    this.chunks.Add(chunk);
+                    chunks.Add(chunk);
                 }
 
                 yield return null;
             }
         }
+
+        Player player = new GameObject("Player").AddComponent<Player>();
+        player.Init();
     }
 
-    public Chunk GetChunk(Vector3 pos) {
-        for(int i = 0; i < this.chunks.Count; i++) {
-            if(this.chunks[i].transform.position == pos) {
-                return this.chunks[i];
+    public static Chunk GetChunkBlock(Vector3 pos) {        
+        for(int i = 0; i < chunks.Count; i++) {            
+            Vector3 chunkPos = chunks[i].transform.position;
+
+            if(
+                pos.x < chunkPos.x || pos.x >= chunkPos.x + Chunk.chunkSizeInBlocks.x || 
+                pos.y < chunkPos.y || pos.y >= chunkPos.y + Chunk.chunkSizeInBlocks.y || 
+                pos.z < chunkPos.z || pos.z >= chunkPos.z + Chunk.chunkSizeInBlocks.z
+            ) {
+                continue;
+            }
+
+            return chunks[i];
+        }
+
+        return null;
+    }
+
+    public static Chunk GetChunk(Vector3 pos) {
+        for(int i = 0; i < chunks.Count; i++) {
+            if(chunks[i].transform.position == pos) {
+                return chunks[i];
             }
         }
 
@@ -59,42 +80,42 @@ public class World : MonoBehaviour {
         int y = (int)chunk.transform.position.y;
         int z = (int)chunk.transform.position.z;
 
-        Chunk neighbor = this.GetChunk(new Vector3(x + 16, y, z));
+        Chunk neighbor = GetChunk(new Vector3(x + 16, y, z));
 
         if(neighbor != null) {
             chunk.neighbors[0] = neighbor;
             neighbor.neighbors[1] = chunk;
         }
         
-        neighbor = this.GetChunk(new Vector3(x - 16, y, z));
+        neighbor = GetChunk(new Vector3(x - 16, y, z));
 
         if(neighbor != null) {
             chunk.neighbors[1] = neighbor;
             neighbor.neighbors[0] = chunk;
         }
         
-        neighbor = this.GetChunk(new Vector3(x, y + 16, z));
+        neighbor = GetChunk(new Vector3(x, y + 16, z));
 
         if(neighbor != null) {
             chunk.neighbors[2] = neighbor;
             neighbor.neighbors[3] = chunk;
         }
         
-        neighbor = this.GetChunk(new Vector3(x, y - 16, z));
+        neighbor = GetChunk(new Vector3(x, y - 16, z));
 
         if(neighbor != null) {
             chunk.neighbors[3] = neighbor;
             neighbor.neighbors[2] = chunk;
         }
         
-        neighbor = this.GetChunk(new Vector3(x, y, z + 16));
+        neighbor = GetChunk(new Vector3(x, y, z + 16));
 
         if(neighbor != null) {
             chunk.neighbors[4] = neighbor;
             neighbor.neighbors[5] = chunk;
         }
         
-        neighbor = this.GetChunk(new Vector3(x, y, z - 16));
+        neighbor = GetChunk(new Vector3(x, y, z - 16));
 
         if(neighbor != null) {
             chunk.neighbors[5] = neighbor;

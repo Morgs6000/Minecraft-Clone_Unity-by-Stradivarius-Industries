@@ -26,9 +26,14 @@ public class Chunk : MonoBehaviour {
     public Chunk[] neighbors = new Chunk[6];
 
     public void Init(Transform world, Vector3 offset) {
+        //GameObject newChunk = new GameObject();
+
         int x = (int)offset.x;
         int y = (int)offset.y;
         int z = (int)offset.z;
+
+        name = "Chunk: " + x + ", " + y + ", " + z;
+        transform.parent = world;
         
         Vector3 chunkOffset = new Vector3(
             x * chunkSizeInBlocks.x,
@@ -36,10 +41,6 @@ public class Chunk : MonoBehaviour {
             z * chunkSizeInBlocks.z
         );
 
-        //GameObject newChunk = new GameObject();
-
-        name = "Chunk: " + x + ", " + y + ", " + z;
-        transform.parent = world;
         transform.position = chunkOffset;
 
         //Chunk chunk = gameObject.AddComponent<Chunk>();
@@ -50,6 +51,38 @@ public class Chunk : MonoBehaviour {
         this.material = Resources.Load<Material>("Materials/Terrain");
 
         this.BlockMapGen();
+    }
+
+    public void SetBlock(Vector3 worldPos, Block block) {
+        Vector3 localPos = worldPos - transform.position;
+
+        int x = Mathf.FloorToInt(localPos.x);
+        int y = Mathf.FloorToInt(localPos.y);
+        int z = Mathf.FloorToInt(localPos.z);
+
+        blocks[x, y, z] = block;
+
+        ChunkGen();
+    }
+
+    public Block GetBlock(Vector3 worldPos) {
+        Vector3 localPos = worldPos - transform.position;
+
+        int x = Mathf.FloorToInt(localPos.x);
+        int y = Mathf.FloorToInt(localPos.y);
+        int z = Mathf.FloorToInt(localPos.z);
+
+        if(
+            x < 0 || x >= chunkSizeInBlocks.x ||
+            y < 0 || y >= chunkSizeInBlocks.y ||
+            z < 0 || z >= chunkSizeInBlocks.z
+        ) {
+            Debug.LogError("Coordinates out of range");
+
+            return default(Block);
+        }
+
+        return blocks[x, y, z];
     }
 
     public void BlockMapGen() {
@@ -89,6 +122,8 @@ public class Chunk : MonoBehaviour {
     }
 
     private void ChunkGen() {
+        this.Clear();
+
         for(int x = 0; x < chunkSizeInBlocks.x; x++) {
             for(int y = 0; y < chunkSizeInBlocks.y; y++) {
                 for(int z = 0; z < chunkSizeInBlocks.z; z++) {
@@ -100,6 +135,14 @@ public class Chunk : MonoBehaviour {
         }
 
         this.MeshGen();
+    }
+
+    private void Clear() {
+        vertices.Clear();
+        triangles.Clear();
+        uv.Clear();
+
+        vertexIndex = 0;
     }
 
     private void BlockGen(Vector3 offset) {

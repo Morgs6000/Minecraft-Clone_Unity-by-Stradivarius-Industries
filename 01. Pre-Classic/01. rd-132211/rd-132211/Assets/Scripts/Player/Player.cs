@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Player : MonoBehaviour {
-    private new Camera camera;
+    private new Transform camera;
     private float xRotation;
 
     private CharacterController characterController;
@@ -19,18 +19,20 @@ public class Player : MonoBehaviour {
 
     private Vector3 velocity;
 
+    private float rangeHit = 5.0f;
+
     //private float lastClickTime;
     //private float DOUBLE_CLICK_TIME = 0.2f;
 
     private void Awake() {
-        this.camera = GetComponentInChildren<Camera>();
-        this.characterController = GetComponent<CharacterController>();
+        //this.camera = GetComponentInChildren<Camera>();
+        //this.characterController = GetComponent<CharacterController>();
     }
 
     private void Start() {
-        this.speed = this.walking;
+        //this.speed = this.walking;
 
-        this.ResetPos();
+        //this.ResetPos();
     }
 
     private void Update() {
@@ -41,9 +43,42 @@ public class Player : MonoBehaviour {
         this.UpdateFalling();
         this.UpdateJump();
         //this.UpdateSprint();
+
+        if(Input.GetKey(KeyCode.R)) {
+            this.ResetPos();
+        }
+
+        this.UpdateRaycast();
     }
 
-    private void ResetPos() {
+    public void Init() {   
+        //GameObject newPlayer = new GameObject();
+        //Player player = gameObject.AddComponent<Player>();
+
+        this.InitCamera();
+        this.InitCharacterController();
+
+        this.speed = this.walking;
+
+        this.ResetPos();
+    }
+
+    private void InitCamera() {
+        this.camera = new GameObject("Camera").AddComponent<Camera>().transform;
+        this.camera.gameObject.transform.parent = transform;
+        this.camera.transform.position = new Vector3(0.0f, 1.62f, 0.0f);
+    }
+
+    private void InitCharacterController() {
+        this.characterController = gameObject.AddComponent<CharacterController>();
+
+        this.characterController.stepOffset = 0.0f;
+        this.characterController.center = new Vector3(0.0f, 0.9f, 0.0f);
+        this.characterController.radius = 0.3f;
+        this.characterController.height = 1.8f;
+    }
+
+    private void ResetPos() {        
         Vector3 worldSize = new Vector3(
             (World.worldSizeInBlocks.x - 1) / 2,
             World.worldSizeInBlocks.y,
@@ -66,7 +101,7 @@ public class Player : MonoBehaviour {
         this.xRotation -= mouseY;
         this.xRotation = Mathf.Clamp(this.xRotation, -90, 90);
 
-        this.camera.transform.localRotation = Quaternion.Euler(this.xRotation, 0, 0);
+        this.camera.localRotation = Quaternion.Euler(this.xRotation, 0, 0);
     }
 
     private void UpdateMovement() {
@@ -135,4 +170,147 @@ public class Player : MonoBehaviour {
         }
     }
     */
+
+    private GameObject highlight;
+    private GameObject cube;
+    //private Color color;
+    //private Color colorA;
+    //private Color colorB;
+    //private float colorSpeed;
+    private List<Vector3> vertices = new List<Vector3>();
+    private List<int> triangles = new List<int>();
+    private MeshFilter meshFilter;
+    private MeshRenderer meshRenderer;
+    private Material material;
+
+    private void UpdateRaycast() {
+        RaycastHit hit;
+
+        if(Physics.Raycast(this.camera.position, this.camera.forward, out hit, this.rangeHit)) {
+            Vector3 pointPos = hit.point - hit.normal / 2;
+            Vector3 pointPos2 = hit.point + hit.normal / 2;
+
+            //if(!this.highlight) {
+                this.CreateHighlight(pointPos, pointPos2);
+            //}
+
+            this.highlight.transform.position = new Vector3(
+                Mathf.FloorToInt(pointPos.x),
+                Mathf.FloorToInt(pointPos.y),
+                Mathf.FloorToInt(pointPos.z)
+            );
+
+            this.highlight.SetActive(true);
+            this.UpdateColor();
+
+            if(Input.GetMouseButtonDown(0)) {
+                Chunk c = World.GetChunkBlock(new Vector3(
+                    Mathf.FloorToInt(pointPos.x),
+                    Mathf.FloorToInt(pointPos.y),
+                    Mathf.FloorToInt(pointPos.z)
+                ));
+
+                c.SetBlock(pointPos, Block.AIR);
+            }
+            if(Input.GetMouseButtonDown(1)) {
+                float distance = 0.81f;
+                float playerDistance = Vector3.Distance(transform.position, pointPos);
+                float camDistance = Vector3.Distance(camera.position, pointPos);
+
+                if(playerDistance < distance || camDistance < distance) {
+                    return;
+                }
+                if(pointPos.y > World.worldSizeInBlocks.y) {
+                    //WarningMensage();
+                    
+                    return;
+                }
+
+                Chunk c = World.GetChunkBlock(new Vector3(
+                    Mathf.FloorToInt(pointPos2.x),
+                    Mathf.FloorToInt(pointPos2.y),
+                    Mathf.FloorToInt(pointPos2.z)
+                ));
+
+                c.SetBlock(pointPos2, Block.STONE);
+            }
+        }
+        else {
+            if(this.highlight) {
+                this.highlight.SetActive(false);
+            }
+        }
+    }
+
+    private void CreateHighlight(Vector3 pointPos, Vector3 pointPos2) {
+        if(!this.highlight) {
+            highlight = new GameObject("Block Highlight");
+
+            this.meshFilter = this.highlight.AddComponent<MeshFilter>();
+            this.meshRenderer = this.highlight.AddComponent<MeshRenderer>();
+            
+            this.material = Resources.Load<Material>("Materials/Block Highlight");
+        }
+
+        //CreateCube();
+
+        Mesh mesh = new Mesh();
+        mesh.name = "Block Highlight";
+
+        this.vertices.Clear();
+        this.triangles.Clear();
+
+        for(int verts = 0; verts < 4; verts++) {
+            if(pointPos2.x > pointPos.x) {
+                this.vertices.Add(Block.GetVertices()[0, verts]);
+            }
+            if(pointPos2.x < pointPos.x) {
+                this.vertices.Add(Block.GetVertices()[1, verts]);
+            }
+            if(pointPos2.y > pointPos.y) {
+                this.vertices.Add(Block.GetVertices()[2, verts]);
+            }
+            if(pointPos2.y < pointPos.y) {
+                this.vertices.Add(Block.GetVertices()[3, verts]);
+            }
+            if(pointPos2.z > pointPos.z) {
+                this.vertices.Add(Block.GetVertices()[4, verts]);
+            }
+            if(pointPos2.z < pointPos.z) {
+                this.vertices.Add(Block.GetVertices()[5, verts]);
+            }
+        }
+        for(int tris = 0; tris < 6; tris++) {
+            this.triangles.Add(Block.GetTriangles()[tris]);
+        }
+
+        mesh.vertices = vertices.ToArray();
+        mesh.triangles = triangles.ToArray();
+
+        mesh.RecalculateBounds();
+        mesh.RecalculateNormals();
+        mesh.RecalculateTangents();
+        mesh.Optimize();
+
+        this.meshFilter.mesh = mesh;
+        this.meshRenderer.material = material;
+    }
+
+    /*
+    private void CreateCube() {
+        this.cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        this.cube.transform.parent = this.highlight.transform;
+        this.cube.transform.position = new Vector3(0.5f, 0.5f, 0.5f);
+
+        this.meshRenderer = this.cube.GetComponent<MeshRenderer>();
+        this.material = Resources.Load<Material>("Materials/Block Highlight");
+        this.meshRenderer.material = this.material;
+    }
+    */
+
+    private void UpdateColor() {
+        Color color = this.material.color;
+        color.a = Mathf.PingPong(Time.time * 2.0f, 1) / 2;
+        this.material.color = color;
+    }
 }
