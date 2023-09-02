@@ -52,30 +52,8 @@ public class Player : MonoBehaviour {
         this.UpdateRaycast();
 
         this.InputQuitGame();
+        this.InputSaveGame();
         //this.InputFullScreen();
-    }
-
-    /*
-    private bool isFullScreen = false;
-    
-    private void InputFullScreen() {
-        if(Input.GetKeyDown(KeyCode.F11)) {
-            this.isFullScreen = !this.isFullScreen;
-            Screen.fullScreen = this.isFullScreen;
-        }
-    }
-    */
-
-    private void InputSaveGame() {
-        if(Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)) {
-            
-        }
-    }
-
-    private void InputQuitGame() {
-        if(Input.GetKeyDown(KeyCode.Escape)) {
-            Application.Quit();
-        }
     }
 
     public void Init() {   
@@ -359,4 +337,27 @@ public class Player : MonoBehaviour {
         color.a = Mathf.PingPong(Time.time * 2.0f, 1) / 2;
         this.material.color = color;
     }
+
+    private void InputQuitGame() {
+        if(Input.GetKeyDown(KeyCode.Escape)) {
+            Application.Quit();
+        }
+    }
+
+    private void InputSaveGame() {
+        if(Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)) {
+            SaveHandler.Save();
+        }
+    }
+
+    /*
+    private bool isFullScreen = false;
+    
+    private void InputFullScreen() {
+        if(Input.GetKeyDown(KeyCode.F11)) {
+            this.isFullScreen = !this.isFullScreen;
+            Screen.fullScreen = this.isFullScreen;
+        }
+    }
+    */
 }

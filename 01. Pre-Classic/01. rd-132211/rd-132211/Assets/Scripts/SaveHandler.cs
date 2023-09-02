@@ -6,24 +6,26 @@ using UnityEngine;
 
 public class SaveHandler : MonoBehaviour {
     // Nome do arquivo onde os dados serão salvos.
-    private string level = "level.json";
+    private static string level = "level.json";
 
+    /*
     public struct LevelData {
 
     }
+    */
 
-    public void Load() {
+    public static void Load() {
         // Verifica se o arquivo de nível existe.
         if(File.Exists(level)) {
             // Lê o conteúdo do arquivo JSON.
             string json = File.ReadAllText(level);
 
             // Converte o JSON para a estrutura LevelData.
-            LevelData levelData = JsonUtility.FromJson<LevelData>(json);
+            //LevelData levelData = JsonUtility.FromJson<LevelData>(json);
         }
     }
 
-    public void Save() {
+    public static void Save() {
         // Nome da pasta onde o arquivo será salvo.
         string folder = ".mineclone";
 
@@ -42,10 +44,10 @@ public class SaveHandler : MonoBehaviour {
         string pathFile = Path.Combine(pathFolder, level);
 
         // Cria uma instância da estrutura LevelData.
-        LevelData levelData = new LevelData();
+        //LevelData levelData = new LevelData();
 
         // Converte a estrutura LevelData em JSON.
-        string json = JsonUtility.ToJson(levelData);
+        string json = JsonUtility.ToJson(Chunk.blocks);
 
         // Escreve o JSON no arquivo.
         File.WriteAllText(pathFile, json);

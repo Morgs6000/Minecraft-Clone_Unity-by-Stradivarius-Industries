@@ -18,7 +18,7 @@ public class Chunk : MonoBehaviour {
 
     public static Vector3 chunkSizeInBlocks = new Vector3(16, 16, 16);
 
-    private Block[,,] blocks = new Block[
+    public static Block[,,] blocks = new Block[
         (int)chunkSizeInBlocks.x,
         (int)chunkSizeInBlocks.y,
         (int)chunkSizeInBlocks.z
@@ -143,13 +143,13 @@ public class Chunk : MonoBehaviour {
         _z += World.worldSizeInBlocks.z;
 
         if(_y < 41) {
-            this.blocks[x, y, z] = Block.STONE;
+            blocks[x, y, z] = Block.STONE;
         }
         else if(_y == 41) {
-            this.blocks[x, y, z] = Block.GRASS;
+            blocks[x, y, z] = Block.GRASS;
         }
         else {
-            this.blocks[x, y, z] = Block.AIR;
+            blocks[x, y, z] = Block.AIR;
         }
     }
 
