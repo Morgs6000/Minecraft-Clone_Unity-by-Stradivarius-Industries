@@ -172,15 +172,14 @@ public class Player : MonoBehaviour {
     */
 
     private GameObject highlight;
-    private GameObject cube;
-    //private Color color;
-    //private Color colorA;
-    //private Color colorB;
-    //private float colorSpeed;
+    //private GameObject cube;
+
     private List<Vector3> vertices = new List<Vector3>();
     private List<int> triangles = new List<int>();
+
     private MeshFilter meshFilter;
     private MeshRenderer meshRenderer;
+
     private Material material;
 
     private void UpdateRaycast() {
@@ -190,9 +189,9 @@ public class Player : MonoBehaviour {
             Vector3 pointPos = hit.point - hit.normal / 2;
             Vector3 pointPos2 = hit.point + hit.normal / 2;
 
-            //if(!this.highlight) {
-                this.CreateHighlight(pointPos, pointPos2);
-            //}
+            if(!this.highlight) {
+                this.CreateHighlight();
+            }
 
             this.highlight.transform.position = new Vector3(
                 Mathf.FloorToInt(pointPos.x),
@@ -201,6 +200,7 @@ public class Player : MonoBehaviour {
             );
 
             this.highlight.SetActive(true);
+            this.UpdateHighlight(pointPos, pointPos2);
             this.UpdateColor();
 
             if(Input.GetMouseButtonDown(0)) {
@@ -242,18 +242,30 @@ public class Player : MonoBehaviour {
         }
     }
 
-    private void CreateHighlight(Vector3 pointPos, Vector3 pointPos2) {
-        if(!this.highlight) {
-            highlight = new GameObject("Block Highlight");
+    private void CreateHighlight() {
+        this.highlight = new GameObject("Block Highlight");
 
-            this.meshFilter = this.highlight.AddComponent<MeshFilter>();
-            this.meshRenderer = this.highlight.AddComponent<MeshRenderer>();
-            
-            this.material = Resources.Load<Material>("Materials/Block Highlight");
-        }
+        this.meshFilter = this.highlight.AddComponent<MeshFilter>();
+        this.meshRenderer = this.highlight.AddComponent<MeshRenderer>();
+        
+        this.material = Resources.Load<Material>("Materials/Block Highlight");
 
         //CreateCube();
+    }
 
+    /*
+    private void CreateCube() {
+        this.cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        this.cube.transform.parent = this.highlight.transform;
+        this.cube.transform.position = new Vector3(0.5f, 0.5f, 0.5f);
+
+        this.meshRenderer = this.cube.GetComponent<MeshRenderer>();
+        this.material = Resources.Load<Material>("Materials/Block Highlight");
+        this.meshRenderer.material = this.material;
+    }
+    */
+
+    private void UpdateHighlight(Vector3 pointPos, Vector3 pointPos2) {
         Mesh mesh = new Mesh();
         mesh.name = "Block Highlight";
 
@@ -295,18 +307,6 @@ public class Player : MonoBehaviour {
         this.meshFilter.mesh = mesh;
         this.meshRenderer.material = material;
     }
-
-    /*
-    private void CreateCube() {
-        this.cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        this.cube.transform.parent = this.highlight.transform;
-        this.cube.transform.position = new Vector3(0.5f, 0.5f, 0.5f);
-
-        this.meshRenderer = this.cube.GetComponent<MeshRenderer>();
-        this.material = Resources.Load<Material>("Materials/Block Highlight");
-        this.meshRenderer.material = this.material;
-    }
-    */
 
     private void UpdateColor() {
         Color color = this.material.color;
