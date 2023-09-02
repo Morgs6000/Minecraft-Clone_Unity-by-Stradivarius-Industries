@@ -8,11 +8,14 @@ public class SaveHandler : MonoBehaviour {
     // Nome do arquivo onde os dados serão salvos.
     private static string level = "level.json";
 
-    /*
+    [System.Serializable]
     public struct LevelData {
+        public string[,,] blocks;
 
+        public LevelData(string[,,] blocks) {
+            this.blocks = blocks;
+        }
     }
-    */
 
     public static void Load() {
         // Verifica se o arquivo de nível existe.
@@ -44,10 +47,10 @@ public class SaveHandler : MonoBehaviour {
         string pathFile = Path.Combine(pathFolder, level);
 
         // Cria uma instância da estrutura LevelData.
-        //LevelData levelData = new LevelData();
+        LevelData levelData = new LevelData(Chunk.blocks);
 
         // Converte a estrutura LevelData em JSON.
-        string json = JsonUtility.ToJson(Chunk.blocks);
+        string json = JsonUtility.ToJson(levelData);
 
         // Escreve o JSON no arquivo.
         File.WriteAllText(pathFile, json);

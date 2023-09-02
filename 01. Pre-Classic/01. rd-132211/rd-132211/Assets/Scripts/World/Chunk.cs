@@ -18,7 +18,7 @@ public class Chunk : MonoBehaviour {
 
     public static Vector3 chunkSizeInBlocks = new Vector3(16, 16, 16);
 
-    public static Block[,,] blocks = new Block[
+    public static string[,,] blocks = new string[
         (int)chunkSizeInBlocks.x,
         (int)chunkSizeInBlocks.y,
         (int)chunkSizeInBlocks.z
@@ -85,7 +85,7 @@ public class Chunk : MonoBehaviour {
     }
     */
 
-    public void SetBlock(Vector3 worldPos, Block block) {
+    public void SetBlock(Vector3 worldPos, string block) {
         Vector3 localPos = worldPos - transform.position;
 
         int x = Mathf.FloorToInt(localPos.x);
@@ -97,7 +97,7 @@ public class Chunk : MonoBehaviour {
         ChunkGen();
     }
 
-    public Block GetBlock(Vector3 worldPos) {
+    public string GetBlock(Vector3 worldPos) {
         Vector3 localPos = worldPos - transform.position;
 
         int x = Mathf.FloorToInt(localPos.x);
@@ -111,7 +111,7 @@ public class Chunk : MonoBehaviour {
         ) {
             Debug.LogError("Coordinates out of range");
 
-            return default(Block);
+            //return default(Block);
         }
 
         return blocks[x, y, z];
@@ -143,13 +143,13 @@ public class Chunk : MonoBehaviour {
         _z += World.worldSizeInBlocks.z;
 
         if(_y < 41) {
-            blocks[x, y, z] = Block.STONE;
+            blocks[x, y, z] = Block.STONE.blockID;
         }
         else if(_y == 41) {
-            blocks[x, y, z] = Block.GRASS;
+            blocks[x, y, z] = Block.GRASS.blockID;
         }
         else {
-            blocks[x, y, z] = Block.AIR;
+            blocks[x, y, z] = Block.AIR.blockID;
         }
     }
 
@@ -159,7 +159,7 @@ public class Chunk : MonoBehaviour {
         for(int x = 0; x < chunkSizeInBlocks.x; x++) {
             for(int y = 0; y < chunkSizeInBlocks.y; y++) {
                 for(int z = 0; z < chunkSizeInBlocks.z; z++) {
-                    if(blocks[x, y, z] != Block.AIR) {
+                    if(blocks[x, y, z] != Block.AIR.blockID) {
                         this.BlockGen(new Vector3(x, y, z));
                     }
                 }
@@ -187,7 +187,7 @@ public class Chunk : MonoBehaviour {
                 for(int verts = 0; verts < 4; verts++) {
                     this.vertices.Add(Block.GetVertices()[side, verts] + offset);
 
-                    this.uv.Add(Block.SetUV(blocks[x, y, z].GetUVCoord())[verts]);
+                    this.uv.Add(Block.SetUV(Block.GetBlockID(blocks[x, y, z]).GetUVCoord())[verts]);
                 }
                 for(int tris = 0; tris < 6; tris++) {
                     this.triangles.Add(Block.GetTriangles()[tris] + vertexIndex);
@@ -252,7 +252,7 @@ public class Chunk : MonoBehaviour {
             }
         }
 
-        return !blocks[x, y, z].GetTransparent();
+        return !Block.GetBlockID(blocks[x, y, z]).GetTransparent();
     }
 
     private void MeshGen() {

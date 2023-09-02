@@ -2,19 +2,31 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
 public class Block {
-    public static List<Block> blocks = new List<Block>();
+    public static Dictionary<string, Block> blocks = new Dictionary<string, Block>();
 
-    public static Block AIR = new Block().SetTransparent();
-    public static Block STONE = new Block().SetUVCoord(1, 0);
-    public static Block GRASS = new Block().SetUVCoord(0, 0);
+    public static Block AIR = new Block("air").SetTransparent();
+    public static Block STONE = new Block("stone").SetUVCoord(1, 0);
+    public static Block GRASS = new Block("grass").SetUVCoord(0, 0);
+
+    public string blockID;
 
     private Vector2 blockUV;
 
     private bool isTransparent = false;
 
-    private Block() {
-        blocks.Add(this);
+    private Block(string blockID) {
+        this.blockID = blockID;
+        blocks.Add(blockID, this);
+    }
+
+    public static Block GetBlockID(string blockID) {
+        if(!blocks.ContainsKey(blockID)) {
+            return AIR;
+        }
+
+        return blocks[blockID];
     }
 
     public Block SetUVCoord(int x, int y) {

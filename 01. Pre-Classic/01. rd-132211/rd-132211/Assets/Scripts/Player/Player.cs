@@ -234,7 +234,7 @@ public class Player : MonoBehaviour {
                     Mathf.FloorToInt(pointPos.z)
                 ));
 
-                c.SetBlock(pointPos, Block.AIR);
+                c.SetBlock(pointPos, Block.AIR.blockID);
             }
             if(Input.GetMouseButtonDown(0)) {
                 float distance = 0.81f;
@@ -256,7 +256,7 @@ public class Player : MonoBehaviour {
                     Mathf.FloorToInt(pointPos2.z)
                 ));
 
-                c.SetBlock(pointPos2, Block.STONE);
+                c.SetBlock(pointPos2, Block.STONE.blockID);
             }
         }
         else {
@@ -340,6 +340,7 @@ public class Player : MonoBehaviour {
 
     private void InputQuitGame() {
         if(Input.GetKeyDown(KeyCode.Escape)) {
+            SaveHandler.Save();
             Application.Quit();
         }
     }
