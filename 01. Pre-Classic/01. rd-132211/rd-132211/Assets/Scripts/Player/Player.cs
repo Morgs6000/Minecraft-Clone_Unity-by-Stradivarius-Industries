@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Security;
 using UnityEngine;
 
 public class Player : MonoBehaviour {
@@ -49,6 +50,32 @@ public class Player : MonoBehaviour {
         }
 
         this.UpdateRaycast();
+
+        this.InputQuitGame();
+        //this.InputFullScreen();
+    }
+
+    /*
+    private bool isFullScreen = false;
+    
+    private void InputFullScreen() {
+        if(Input.GetKeyDown(KeyCode.F11)) {
+            this.isFullScreen = !this.isFullScreen;
+            Screen.fullScreen = this.isFullScreen;
+        }
+    }
+    */
+
+    private void InputSaveGame() {
+        if(Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)) {
+            
+        }
+    }
+
+    private void InputQuitGame() {
+        if(Input.GetKeyDown(KeyCode.Escape)) {
+            Application.Quit();
+        }
     }
 
     public void Init() {   
@@ -95,6 +122,23 @@ public class Player : MonoBehaviour {
     private void UpdateCamera() {
         float mouseX = Input.GetAxis("Mouse X");
         float mouseY = Input.GetAxis("Mouse Y");
+        /*
+        float mouseX = 0.0f;
+        float mouseY = 0.0f;
+
+        if() {
+            mouseX++;
+        }
+        if() {
+            mouseX--;
+        }
+        if() {
+            mouseY++;
+        }
+        if() {
+            mouseY--;
+        }
+        */
 
         transform.Rotate(Vector3.up * mouseX);
 
@@ -182,10 +226,12 @@ public class Player : MonoBehaviour {
 
     private Material material;
 
+    //private LayerMask groundMaks = LayerMask.GetMask("Ground");
+
     private void UpdateRaycast() {
         RaycastHit hit;
 
-        if(Physics.Raycast(this.camera.position, this.camera.forward, out hit, this.rangeHit)) {
+        if(Physics.Raycast(this.camera.position, this.camera.forward, out hit, this.rangeHit, LayerMask.GetMask("Ground"))) {
             Vector3 pointPos = hit.point - hit.normal / 2;
             Vector3 pointPos2 = hit.point + hit.normal / 2;
 
@@ -203,7 +249,7 @@ public class Player : MonoBehaviour {
             this.UpdateHighlight(pointPos, pointPos2);
             this.UpdateColor();
 
-            if(Input.GetMouseButtonDown(0)) {
+            if(Input.GetMouseButtonDown(1)) {
                 Chunk c = World.GetChunkBlock(new Vector3(
                     Mathf.FloorToInt(pointPos.x),
                     Mathf.FloorToInt(pointPos.y),
@@ -212,7 +258,7 @@ public class Player : MonoBehaviour {
 
                 c.SetBlock(pointPos, Block.AIR);
             }
-            if(Input.GetMouseButtonDown(1)) {
+            if(Input.GetMouseButtonDown(0)) {
                 float distance = 0.81f;
                 float playerDistance = Vector3.Distance(transform.position, pointPos);
                 float camDistance = Vector3.Distance(camera.position, pointPos);

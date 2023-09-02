@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 public class Chunk : MonoBehaviour {
@@ -51,7 +52,38 @@ public class Chunk : MonoBehaviour {
         this.material = Resources.Load<Material>("Materials/Terrain");
 
         this.BlockMapGen();
+
+        //this.SetLayer();
+        gameObject.layer = LayerMask.NameToLayer("Ground");;
     }
+
+    /*
+    private void SetLayer() {
+        // Nome da nova camada
+        string novaLayerNome = "Ground";
+        
+        int novaLayer = LayerMask.NameToLayer(novaLayerNome);
+        
+        if(novaLayer == -1) {
+            SerializedObject tagManager = new SerializedObject(AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/TagManager.asset")[0]);
+            SerializedProperty layersProp = tagManager.FindProperty("layers");
+            
+            for (int i = 8; i < 32; i++) // Comece a procurar a partir do índice 8 (índice 0-7 são camadas padrão)
+            {
+                SerializedProperty layerProp = layersProp.GetArrayElementAtIndex(i);
+                if (layerProp.stringValue == "")
+                {
+                    layerProp.stringValue = novaLayerNome;
+                    tagManager.ApplyModifiedProperties();
+                    //Debug.Log($"Nova camada '{novaLayerNome}' criada na camada {i}.");
+                    return;
+                }
+            }
+        }
+
+        gameObject.layer = novaLayer;
+    }
+    */
 
     public void SetBlock(Vector3 worldPos, Block block) {
         Vector3 localPos = worldPos - transform.position;
@@ -110,10 +142,10 @@ public class Chunk : MonoBehaviour {
         //_y += World.worldSizeInBlocks.y;
         _z += World.worldSizeInBlocks.z;
 
-        if(_y < 32) {
+        if(_y < 41) {
             this.blocks[x, y, z] = Block.STONE;
         }
-        else if(_y == 32) {
+        else if(_y == 41) {
             this.blocks[x, y, z] = Block.GRASS;
         }
         else {

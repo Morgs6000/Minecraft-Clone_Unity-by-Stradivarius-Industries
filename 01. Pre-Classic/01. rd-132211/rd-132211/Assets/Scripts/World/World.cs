@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -15,8 +16,12 @@ public class World : MonoBehaviour {
 
     private static List<Chunk> chunks = new List<Chunk>();
 
+    private void Awake() {
+        //this.SetLayer();
+    }
+
     private void Start() {
-        StartCoroutine(WorldGen());
+        StartCoroutine(this.WorldGen());
     }
 
     private IEnumerator WorldGen() {
@@ -122,4 +127,34 @@ public class World : MonoBehaviour {
             neighbor.neighbors[4] = chunk;
         }
     }
+    
+    /*
+    private void SetLayer() {
+        #if UNITY_EDITOR
+
+        // Nome da nova camada
+        string novaLayerNome = "Ground";
+        
+        int novaLayer = LayerMask.NameToLayer(novaLayerNome);
+        
+        if(novaLayer == -1) {
+            SerializedObject tagManager = new SerializedObject(AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/TagManager.asset")[0]);
+            SerializedProperty layersProp = tagManager.FindProperty("layers");
+            
+            for (int i = 8; i < 32; i++) // Comece a procurar a partir do índice 8 (índice 0-7 são camadas padrão)
+            {
+                SerializedProperty layerProp = layersProp.GetArrayElementAtIndex(i);
+                if (layerProp.stringValue == "")
+                {
+                    layerProp.stringValue = novaLayerNome;
+                    tagManager.ApplyModifiedProperties();
+                    //Debug.Log($"Nova camada '{novaLayerNome}' criada na camada {i}.");
+                    return;
+                }
+            }
+        }
+
+        #endif
+    }
+    */
 }
