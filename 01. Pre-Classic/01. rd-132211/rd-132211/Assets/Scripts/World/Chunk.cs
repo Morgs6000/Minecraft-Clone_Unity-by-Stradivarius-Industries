@@ -127,7 +127,7 @@ public class Chunk : MonoBehaviour {
         for(int x = 0; x < chunkSizeInBlocks.x; x++) {
             for(int y = 0; y < chunkSizeInBlocks.y; y++) {
                 for(int z = 0; z < chunkSizeInBlocks.z; z++) {
-                    if(blocks[x, y, z] != null) {
+                    if(blocks[x, y, z] != Block.AIR) {
                         this.BlockGen(new Vector3(x, y, z));
                     }
                 }
@@ -152,9 +152,6 @@ public class Chunk : MonoBehaviour {
 
         for(int side = 0; side < 6; side++) {
             if(!HasSolidNeighbor(Block.blockSide[side] + offset)) {
-                if(blocks[x, y, z] == Block.AIR) {
-                    continue;
-                }
                 for(int verts = 0; verts < 4; verts++) {
                     this.vertices.Add(Block.GetVertices()[side, verts] + offset);
 
