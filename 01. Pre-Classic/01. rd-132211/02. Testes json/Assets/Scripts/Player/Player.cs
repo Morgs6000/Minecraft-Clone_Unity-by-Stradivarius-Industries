@@ -306,14 +306,14 @@ public class Player : MonoBehaviour {
 
     private void InputQuitGame() {
         if(Input.GetKeyDown(KeyCode.Escape)) {
-            SaveHandler.Save();
+            //SaveHandler.Save();
             Application.Quit();
         }
     }
 
     private void InputSaveGame() {
         if(Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)) {
-            SaveHandler.Save();
+            //SaveHandler.Save();
         }
     }
 

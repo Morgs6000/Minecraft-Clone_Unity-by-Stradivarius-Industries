@@ -1,11 +1,10 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using TMPro;
 using UnityEngine;
 
 public class Chunk : MonoBehaviour {
+    private Mesh mesh;
+
     private List<Vector3> vertices = new List<Vector3>();
     private List<int> triangles = new List<int>();
     private List<Vector2> uv = new List<Vector2>();
@@ -44,6 +43,16 @@ public class Chunk : MonoBehaviour {
         
     }
 
+    private string ChunkName() {
+        int x = (int)transform.position.x / 16;
+        int y = (int)transform.position.y / 16;
+        int z = (int)transform.position.z / 16;
+
+        string chunkName = x + ", " + y + ", " + z;
+
+        return chunkName;
+    }
+
     public void SetBlock(Vector3 worldPos, string block) {
         Vector3 localPos = worldPos - transform.position;
 
@@ -56,8 +65,6 @@ public class Chunk : MonoBehaviour {
         blocks[i] = block;
 
         this.ChunkGen();
-        
-        SaveHandler.Save();
     }
 
     public string GetBlock(Vector3 worldPos) {
@@ -91,7 +98,7 @@ public class Chunk : MonoBehaviour {
             }
         }
         
-        SaveHandler.Load();
+        SaveHandler.Load(ChunkName());
         this.ChunkGen();
     }
 
@@ -118,6 +125,9 @@ public class Chunk : MonoBehaviour {
     }
 
     public void ChunkGen() {
+        mesh = new Mesh();
+        mesh.name = "Chunk";
+
         this.Clear();
 
         for(int x = 0; x < chunkSizeInBlocks.x; x++) {
@@ -132,10 +142,13 @@ public class Chunk : MonoBehaviour {
             }
         }
 
+        SaveHandler.Save(ChunkName());
         this.MeshGen();
     }
 
     private void Clear() {
+        mesh.Clear();
+
         vertices.Clear();
         triangles.Clear();
         uv.Clear();
@@ -192,9 +205,6 @@ public class Chunk : MonoBehaviour {
     }
 
     private void MeshGen() {
-        Mesh mesh = new Mesh();
-        mesh.name = "Chunk";
-
         mesh.vertices = this.vertices.ToArray();
         mesh.triangles = this.triangles.ToArray();
         mesh.uv = this.uv.ToArray();
@@ -208,9 +218,4 @@ public class Chunk : MonoBehaviour {
         this.meshRenderer.material = material;
         /**/this.meshCollider.sharedMesh = mesh;
     }
-}
-
-[System.Serializable]
-public class ChunkData {
-    public string[] blocks;
 }

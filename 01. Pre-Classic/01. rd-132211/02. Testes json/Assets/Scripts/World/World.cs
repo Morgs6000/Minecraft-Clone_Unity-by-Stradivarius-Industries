@@ -73,7 +73,7 @@ public class World : MonoBehaviour {
             GameObject chunkObject = Instantiate(chunkPrefab);
             chunkObject.transform.SetParent(transform);            
             chunkObject.transform.position = chunkOffset;
-            chunkObject.name = "Chunk: " + x + ", " + z;
+            chunkObject.name = "Chunk: " + x + ", " + y + ", " + z;
 
             this.chunk = chunkObject.GetComponent<Chunk>();
             chunks.Add(this.chunk);
