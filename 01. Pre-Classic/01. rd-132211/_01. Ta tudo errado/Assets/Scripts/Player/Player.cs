@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Security;
 using UnityEngine;
 
 public class Player : MonoBehaviour {
@@ -143,7 +142,7 @@ public class Player : MonoBehaviour {
             x++;
         }
 
-        Vector3 moveDirection = transform.TransformDirection(new Vector3(x, 0.0f, z));
+        Vector3 moveDirection = transform.TransformDirection(x, 0.0f, z);
 
         moveDirection *= this.speed;
         this.characterController.Move(moveDirection * Time.deltaTime);
